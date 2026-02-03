@@ -1,0 +1,620 @@
+/* ===============================
+   Root Variables (Brand Colors)
+================================ */
+:root {
+  --primary-dark: #1f2a44;
+  --primary-dark-alt: #24304f;
+  --brand-green: #5aa832;
+  --brand-green-light: #6fc23a;
+  --secondary-blue: #3a4a6b;
+
+  --bg-main: #f3f5f8;
+  --bg-card: #ffffff;
+
+  --border-light: #e5e9f0;
+
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+
+  --danger: #dc2626;
+  --warning: #f59e0b;
+}
+
+/* ===============================
+   Global
+================================ */
+* {
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+/* ===============================
+   Login
+================================ */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: var(--bg-card);
+  padding: 40px;
+  border-radius: 20px;
+  width: 360px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.08);
+  text-align: center;
+}
+
+.login-card .logo {
+  font-size: 48px;
+}
+
+.login-card h2 {
+  margin: 15px 0 25px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.btn-main {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--brand-green);
+  color: white;
+  font-weight: 700;
+}
+
+.error-text {
+  color: var(--danger);
+  margin-top: 10px;
+}
+
+/* ===============================
+   Header
+================================ */
+header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-dark-alt));
+  color: white;
+  padding: 18px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-logout {
+  background: rgba(255,255,255,.15);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+}
+
+/* ===============================
+   Tabs
+================================ */
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.tab-btn {
+  padding: 10px 22px;
+  border-radius: 14px;
+  background: white;
+  border: 1px solid var(--border-light);
+  font-weight: 700;
+}
+
+.tab-btn.active {
+  background: var(--brand-green);
+  color: white;
+}
+
+.tab-btn.disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   Loader
+================================ */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.fancy-spinner {
+  text-align: center;
+}
+
+.fancy-spinner .ring {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--brand-green);
+  border-color: var(--brand-green) transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===============================
+   Content Cards
+================================ */
+.info-card-styled {
+  background: var(--bg-card);
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.05);
+  text-align: center;
+}
+
+.card-icon-circle {
+  width: 60px;
+  height: 60px;
+  background: var(--brand-green-light);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  font-size: 24px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 20px;
+}
+
+/* ===============================
+   Assignments
+================================ */
+.assign-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.assign-col h4 {
+  margin-bottom: 10px;
+}
+
+.hw-card {
+  background: white;
+  padding: 15px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.hw-card.done {
+  opacity: .7;
+}
+
+.btn-upload-sm {
+  background: var(--secondary-blue);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+/* ===============================
+   Chat
+================================ */
+.chat-wrapper {
+  background: white;
+  border-radius: 18px;
+  padding: 15px;
+}
+
+.chat-tabs-inner {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.chat-tab-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.chat-tab-btn.active {
+  background: var(--brand-green);
+  color: white;
+}
+
+.chat-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 15px;
+}
+
+.chat-sidebar {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.sidebar-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.sidebar-item:hover {
+  background: #eef2f7;
+}
+
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+  background: var(--secondary-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.messages-container {
+  height: 360px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.message-bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.message-bubble.me {
+  background: var(--brand-green);
+  color: white;
+  margin-left: auto;
+}
+
+.message-bubble.others {
+  background: #e5e7eb;
+}
+
+.chat-input-box {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chat-input-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.chat-input-box button {
+  background: var(--brand-green);
+  color: white;
+  padding: 0 18px;
+  border-radius: 12px;
+}
+
+/* ===============================
+   Animations
+================================ */
+.animate-fade-in {
+  animation: fadeIn .6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ===============================
+   Utilities
+================================ */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bg-success { background: var(--brand-green); color: white; }
+.bg-warning { background: var(--warning); color: white; }
+
+.color-success { color: var(--brand-green); }
+.color-warning { color: var(--warning); }
+
+.text-center { text-align: center; }
+
+
+
+
+
+/* منع التمرير الأفقي في كامل الشات */
+.chat-wrapper,
+.chat-layout,
+.chat-sidebar,
+.chat-main-area,
+.messages-container {
+    overflow-x: hidden !important;
+}
+
+/* السماح بالتمرير الرأسي فقط في صندوق الرسائل */
+.messages-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* التأكد من أن عناصر الرسائل لا تتجاوز الحاوية */
+.message-bubble {
+    max-width: 100%; /* أو 70% لو تحب حدود نصية */
+    word-wrap: break-word;
+}
+
+
+
+/* الحاوية الرئيسية للشات */
+.chat-main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: #ffffff;
+}
+
+/* 1. التبويبات العلوية */
+.chat-top-tabs {
+    display: flex;
+    background: #4f46e5;
+    flex-shrink: 0;
+}
+.t-tab {
+    flex: 1;
+    padding: 15px 5px;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.7);
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+}
+.t-tab.active {
+    color: #fff;
+    border-bottom-color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+
+/* 2. القائمة الأفقية (Horizontal Scroll) */
+.horizontal-scroll-list {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+    gap: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+}
+.horizontal-scroll-list::-webkit-scrollbar { display: none; }
+
+.h-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+    cursor: pointer;
+}
+.h-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 4px;
+    border: 2px solid transparent;
+}
+.h-item.selected .h-avatar {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: #fff;
+}
+.h-name { font-size: 10px; color: #555; text-align: center; white-space: nowrap; }
+
+/* 3. منطقة الرسائل */
+.messages-viewport {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background: #f0f2f5;
+}
+.chat-inner-display { display: flex; flex-direction: column; gap: 12px; }
+
+/* فقاعات الرسائل */
+.bubble-wrapper { display: flex; width: 100%; }
+.msg-right { justify-content: flex-end; }
+.msg-left { justify-content: flex-start; }
+
+.msg-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.msg-right .msg-bubble { background: #4f46e5; color: #fff; border-bottom-right-radius: 2px; }
+.msg-left .msg-bubble { background: #fff; color: #333; border-bottom-left-radius: 2px; }
+.msg-time { font-size: 8px; opacity: 0.7; display: block; margin-top: 4px; text-align: left; }
+
+/* 4. حقل الإدخال المثبت في الأسفل */
+.fixed-bottom-input {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.fixed-bottom-input input {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 14px;
+}
+.send-circle-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* الحالات الفارغة واللوادر */
+.chat-placeholder { text-align: center; padding-top: 60px; color: #999; }
+.chat-placeholder i { font-size: 40px; margin-bottom: 10px; display: block; }
+.list-loader { padding: 10px; font-size: 11px; color: #666; }
+
+
+
+/* تنسيق شارة الإشعارات فوق الصورة */
+.h-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #ff3b30; /* لون أحمر تنبيهي */
+    color: white;
+    font-size: 10px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #f8f9fa; /* لإبرازها عن الخلفية */
+    font-weight: bold;
+    padding: 2px;
+}
+
+/* تأثير نبض بسيط لجذب الانتباه للرسائل الجديدة */
+@keyframes pulse-red {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+.notification-badge { animation: pulse-red 2s infinite; }
+
+
+
+.chat-img-msg {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    margin: 5px 0;
+    transition: opacity 0.2s;
+}
+
+.chat-img-msg:hover {
+    opacity: 0.9;
+}
+
+/* تنسيق صورة البروفايل في القائمة العلوية */
+.h-avatar-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* لجعلها دائرية */
+    object-fit: cover; /* لضمان عدم تمدد الصورة */
+    border: 2px solid #e0e7ff; /* إطار خفيف */
+    display: block;
+}
+
+/* تنسيق الحاوية لضمان ثبات الحجم */
+.h-avatar-wrapper {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+}
+
+
+
+
+
+/*━━━━━━━━━━━━━━━━━━*/
+
+
+/*━━━━━━━━━البريد الداخلي ━━━━━━━━━*/
+
+.internal-mail-wrapper { padding: 15px; background: #f9f9f9; height: 100%; overflow-y: auto; }
+.mail-actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.new-mail-btn { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+.mail-card { 
+    background: white; border-radius: 8px; padding: 15px; margin-bottom: 12px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; border-right: 4px solid #ddd;
+    transition: transform 0.2s;
+}
+.mail-card:hover { transform: scale(1.01); border-right-color: #007bff; }
+.mail-card.priority-high { border-right-color: #dc3545; background: #fff8f8; }
+.mail-card-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+.mail-subject { font-weight: bold; display: block; margin-bottom: 5px; color: #333; }
+.mail-excerpt { font-size: 0.9rem; color: #777; margin: 0; }
+.mail-status { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; }
+.status-sent { background: #e3f2fd; color: #0d47a1; }
+
+
