@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الطالب الذكية | Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <section id="login-screen">
+        <div class="login-card">
+            <div class="logo">🎓</div>
+            <h2>بوابة الطالب الذكية</h2>
+            <div id="login-form">
+                <input type="email" id="email" placeholder="البريد الإلكتروني">
+                <input type="password" id="password" placeholder="كلمة المرور">
+                <button id="loginBtn" class="btn-main">تسجيل الدخول</button>
+            </div>
+            <p id="login-msg" class="error-text"></p>
+        </div>
+    </section>
+
+    <main id="main-dashboard" style="display:none;">
+        <header>
+            <div class="user-info">
+                <i class="fas fa-graduation-cap"></i> <span id="user-name">..</span>
+            </div>
+            <button id="logoutBtn" class="btn-logout">خروج <i class="fas fa-sign-out-alt"></i></button>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="profile"><i class="fas fa-id-card"></i> البروفايل</button>
+            <button class="tab-btn" data-tab="assignments"><i class="fas fa-book"></i> الواجبات</button>
+            <button class="tab-btn" data-tab="chat"><i class="fas fa-comments"></i> الشات</button>
+            <button class="tab-btn" data-tab="questions" id="questions-tab">بنك الأسئلة 🔒</button>
+        </nav>
+
+       <div id="loader-global" class="loader-overlay" style="display:none;">
+    <div class="fancy-spinner">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <span class="loading-text"> مزامنة البيانات...</span>
+    </div>
+</div>
+
+
+        <div id="content-area">
+            </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

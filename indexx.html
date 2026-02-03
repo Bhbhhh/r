@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الطالب المتكاملة Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+   
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <div style="font-size: 50px; margin-bottom: 10px;">🎓</div>
+        <h2>بوابة الطالب الذكية</h2>
+        <p style="color: #64748b; margin-bottom: 25px;">أهلاً بك، يرجى تسجيل الدخول للمتابعة</p>
+        <input type="email" id="email" placeholder="البريد الإلكتروني">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <button onclick="handleLogin()" id="loginBtn" class="btn-main">تسجيل الدخول</button>
+        <p id="login-msg" style="color:var(--danger); font-size:14px; margin-top:15px; font-weight: 600;"></p>
+    </div>
+</div>
+
+<div id="main-dashboard" style="display:none;">
+    <header>
+        <div style="font-weight:800; color: var(--primary); font-size: 1.2rem;">
+            <i class="fas fa-graduation-cap"></i> <span id="user-name"></span>
+        </div>
+        <button onclick="logout()" style="background:#fee2e2; color:var(--danger); border:none; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:700;">
+            <i class="fas fa-sign-out-alt"></i> خروج
+        </button>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn" id="btn-profile" onclick="switchTab('profile')"><i class="fas fa-user-circle"></i> البروفايل</button>
+        <button class="tab-btn" id="btn-attendance" onclick="switchTab('attendance')"><i class="fas fa-calendar-check"></i> الحضور</button>
+        <button class="tab-btn" id="btn-assignments" onclick="switchTab('assignments')"><i class="fas fa-book"></i> الواجبات</button>
+        <button class="tab-btn" id="btn-reports" onclick="switchTab('reports')"><i class="fas fa-chart-pie"></i> التقارير</button>
+        <button class="tab-btn" id="btn-chat" onclick="switchTab('chat')"><i class="fas fa-comments"></i> الشات</button>
+        <button class="tab-btn" id="questions-tab">بنك الأسئلة 🔒</button>
+    </div>
+
+    <div id="loader-global">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-weight: 700; color: var(--primary);">جاري تحميل البيانات...</p>
+    </div>
+
+    <div id="profile" class="content-section">
+        <div class="card">
+            <h3 style="margin-top: 0;"><i class="fas fa-id-card"></i> البيانات الأساسية</h3>
+            <div id="profile-content"></div>
+        </div>
+    </div>
+
+    <div id="attendance" class="content-section">
+        <div class="card">
+            <h3 style="margin-top: 0;"><i class="fas fa-user-check"></i> سجل الحضور اليومي</h3>
+            <div id="attendance-content" style="overflow-x: auto;"></div>
+        </div>
+    </div>
+
+   <div id="assignments" class="content-section">
+    <div class="grid">
+        <div class="card">
+            <h3><i class="fas fa-tasks"></i> الواجبات الموكلة</h3>
+            <div id="assignments-list"></div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-check-double"></i> الواجبات المنفذة</h3>
+            <div id="completed-assignments-list"></div>
+        </div>
+    </div>
+</div>
+
+<div id="upload-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>📤 رفع الواجب</h3>
+        <input type="text" id="assign-title-up" placeholder="عنوان الواجب">
+        <textarea id="assign-desc-up" style="width:100%; border-radius:12px; border:1px solid #ddd; padding:10px;" placeholder="محتوى الواجب"></textarea>
+        <input type="file" id="assign-file" style="margin-top:10px;">
+        <button class="btn-main" style="margin-top:20px;" onclick="handleUpload()">🚀 رفع الواجب للسيرفر</button>
+        <button onclick="closeModal('upload-modal')" style="background:none; border:none; color:var(--secondary); cursor:pointer; margin-top:10px;">إلغاء</button>
+    </div>
+</div>
+     <div id="toast-container"></div>
+<div id="reports" class="content-section">
+    <div class="grid">
+        <div class="card">
+            <h3><i class="fas fa-history"></i> تقاريري السابقة</h3>
+            <div id="reports-list"></div>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-plus-circle"></i> إضافة تقرير جديد</h3>
+            <textarea id="report-text" class="input" style="width:100%; height:100px; border:1px solid #ddd; border-radius:12px; padding:10px;" placeholder="ماذا أنجزت اليوم؟"></textarea>
+            <button onclick="submitReport()" class="btn-main" style="margin-top:10px;">➕ إضافة التقرير</button>
+        </div>
+    </div>
+</div>
+
+    <div id="chat" class="content-section">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0">
+            <div class="nav-tabs chat-tabs" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="tab-btn active" onclick="switchChatTab('private')"><i class="fas fa-user"></i> خاصة</button>
+                <button class="tab-btn" onclick="switchChatTab('channels')"><i class="fas fa-hashtag"></i> قنوات</button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row-chat" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="chat-sidebar-custom" style="flex: 1; min-width: 250px; max-height: 450px; overflow-y: auto;">
+                    <div id="privateChatUsers" class="list-group">
+                        <small class="text-muted p-2 text-center d-block">جاري تحميل الأعضاء...</small>
+                    </div>
+                    <div id="userChannelsList" class="list-group" style="display: none;">
+                        <small class="text-muted p-2 text-center d-block">جاري تحميل القنوات...</small>
+                    </div>
+                </div>
+
+                <div class="chat-main" style="flex: 2; min-width: 300px; display: flex; flex-direction: column;">
+                    <div id="chatMessagesContainer" class="bg-light p-3 mb-2 rounded border" style="height:380px; overflow-y:auto; background: #f8fafc;">
+                        <div class="text-center text-muted mt-5">اختر محادثة لبدء الدردشة</div>
+                    </div>
+
+                    <div class="input-group" style="display: flex; gap: 5px;">
+                        <input type="text" id="chatMsgInput" class="input" style="flex: 1; border-radius: 50px; padding: 10px 20px;" placeholder="اكتب رسالتك...">
+                        <button class="btn-main" onclick="sendMessage()" style="width: 50px; height: 50px; border-radius: 50%; padding: 0;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div id="questions" class="content-section">
+        <h3 style="margin-bottom: 20px;"><i class="fas fa-brain"></i> بنك الأسئلة التفاعلي</h3>
+        <div id="questions-content" class="grid"></div>
+    </div>
+</div>
+
+<script>
+    /* --- جميع الوظائف البرمجية الأصلية محفوظة بالكامل --- */
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzQsqGwBT-QB9WrJBdjWrWtpis91hsqLRH6dP4UDxBFnD2RqPDzM4g0BtqY77nFIbtrMg/exec";
+    let currentUser = null;
+    let loadedData = {};
+
+    async function handleLogin() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const msg = document.getElementById('login-msg');
+        if(!email || !password) { msg.innerText = "يرجى ملء البيانات"; return; }
+
+        try {
+            document.getElementById('loginBtn').innerText = "جاري التحقق...";
+            const res = await axios.get(WEB_APP_URL, { params: { action: "loginStudent", email, password } });
+            if(res.data.success) {
+                currentUser = res.data.data;
+                localStorage.setItem('student', JSON.stringify(currentUser));
+                initDashboard();
+            } else { 
+                msg.innerText = res.data.message; 
+                document.getElementById('loginBtn').innerText = "تسجيل الدخول";
+            }
+        } catch (e) { 
+            msg.innerText = "خطأ في الاتصال بالسيرفر"; 
+            document.getElementById('loginBtn').innerText = "تسجيل الدخول";
+        }
+    }
+
+    async function initDashboard() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-dashboard').style.display = 'block';
+        document.getElementById('user-name').innerText = currentUser.nameAr;
+        
+        await checkQuestionsAvailability();
+        
+        let lastTab = localStorage.getItem("activeTab") || "profile";
+        const qTab = document.getElementById('questions-tab');
+        
+        if (lastTab === "questions" && (qTab.style.display === 'none' || qTab.classList.contains('disabled'))) {
+            lastTab = "profile";
+            localStorage.setItem("activeTab", "profile");
+        }
+
+        switchTab(lastTab);
+    }
+
+    function switchTab(tabId) {
+        const targetBtn = document.getElementById(tabId === 'questions' ? 'questions-tab' : 'btn-' + tabId);
+        if (targetBtn && targetBtn.classList.contains('disabled')) return;
+
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        if(targetBtn) targetBtn.classList.add('active');
+        
+        localStorage.setItem("activeTab", tabId);
+        if(!loadedData[tabId]) loadData(tabId);
+    }
+
+    async function loadData(tabId) {
+        const loader = document.getElementById('loader-global');
+        loader.style.display = 'flex';
+        try {
+            if(tabId === 'profile') await loadProfile();
+            if(tabId === 'attendance') await loadAttendance();
+            if(tabId === 'assignments') await loadAssignments();
+            if(tabId === 'reports') await loadReports();
+            if(tabId === 'chat') await loadChat();
+            if(tabId === 'questions') await loadQuestions();
+            loadedData[tabId] = true;
+        } catch (e) { console.error("Error loading " + tabId); }
+        loader.style.display = 'none';
+    }
+
+    <!--الملف الشخصي 👇👇-->
+    
+    async function loadProfile() {
+    const res = await axios.get(WEB_APP_URL, { params: { action: "getProfile", id: currentUser.studentId } });
+    const p = res.data;
+    
+    document.getElementById('profile-content').innerHTML = `
+        <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="info-card-styled" style="border-top: 5px solid #3b82f6; background: #fff; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                <div style="background: #eff6ff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-id-badge" style="color:#3b82f6; font-size: 28px;"></i>
+                </div>
+                <div style="font-weight:800; color: #1e293b; font-size: 16px;">رقم الطالب</div>
+                <div style="color:#64748b; margin-top: 8px; font-size: 18px; font-family: monospace;">${p.معرف_الطالب}</div>
+            </div>
+
+            <div class="info-card-styled" style="border-top: 5px solid #8b5cf6; background: #fff; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                <div style="background: #f5f3ff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-graduation-cap" style="color:#8b5cf6; font-size: 28px;"></i>
+                </div>
+                <div style="font-weight:800; color: #1e293b; font-size: 16px;">المستوى الدراسي</div>
+                <div style="color:#64748b; margin-top: 8px; font-size: 18px;">${p.المستوى}</div>
+            </div>
+
+            <div class="info-card-styled" style="border-top: 5px solid #10b981; background: #fff; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                <div style="background: #ecfdf5; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-phone-alt" style="color:#10b981; font-size: 28px;"></i>
+                </div>
+                <div style="font-weight:800; color: #1e293b; font-size: 16px;">رقم التواصل</div>
+                <div style="color:#64748b; margin-top: 8px; font-size: 18px;">${p.رقم_الهاتف}</div>
+            </div>
+
+            <div class="info-card-styled" style="border-top: 5px solid #f59e0b; background: #fff; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                <div style="background: #fffbeb; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-user-check" style="color:#f59e0b; font-size: 28px;"></i>
+                </div>
+                <div style="font-weight:800; color: #1e293b; font-size: 16px;">حالة الحساب</div>
+                <div style="margin-top:10px;"><span class="status-badge" style="background:#dcfce7; color:#166534; padding: 6px 15px; border-radius: 50px; font-size: 14px; font-weight: 700;">${p.الحالة}</span></div>
+            </div>
+        </div>
+    `;
+}
+
+    
+           <!-- سجل الحضور-->
+    async function loadAttendance() {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getTodayAttendance" } });
+        let html = '<table><thead><tr><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>';
+        res.data.data.forEach(row => {
+            if(row.id == currentUser.studentId) {
+                html += `<tr>
+                            <td>${row.date}</td>
+                            <td><span class="status-badge ${row.status === 'حاضر' ? 'bg-success' : 'bg-warning'}">${row.status}</span></td>
+                         </tr>`;
+            }
+        });
+        document.getElementById('attendance-content').innerHTML = html + '</tbody></table>';
+        if(res.data.data.length === 0) document.getElementById('attendance-content').innerHTML = '<p style="text-align:center; padding:20px;">لا يوجد سجل حضور اليوم.</p>';
+    }
+
+    async function loadAssignments() {
+    try {
+        const res = await axios.get(WEB_APP_URL, { 
+            params: { action: "getAssignments" } 
+        });
+        const assignments = res.data;
+        
+        let html = '<div class="assignments-list" style="display: flex; flex-direction: column; gap: 15px;">';
+        
+        assignments.forEach(hw => {
+            // تحديد لون أيقونة الحالة بناءً على النص القادم من الشيت
+            const statusColor = hw.الحالة === "منشور" ? "#10b981" : "#ef4444";
+            const statusBg = hw.الحالة === "منشور" ? "#ecfdf5" : "#fef2f2";
+
+            html += `
+                <div class="hw-card" style="background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-right: 6px solid ${statusColor}; transition: 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <h3 style="margin: 0; color: #1e293b; font-size: 18px;">${hw.عنوان_الواجب}</h3>
+                        <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">
+                            ${hw.الحالة}
+                        </span>
+                    </div>
+                    <p style="color: #64748b; font-size: 14px; margin: 10px 0;">${hw.وصف_الواجب}</p>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f1f5f9;">
+                        <i class="far fa-calendar-alt" style="color: #94a3b8;"></i>
+                        <span style="color: #475569; font-size: 13px;">موعد التسليم: <b>${hw.تاريخ_التسليم}</b></span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        document.getElementById('assignments-content').innerHTML = html;
+
+    } catch (e) {
+        console.error("خطأ في جلب الواجبات:", e);
+        document.getElementById('assignments-content').innerHTML = "تعذر تحميل الواجبات حالياً.";
+    }
+}
+
+
+    async function loadReports() {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getTodayReports" } });
+        let html = '';
+        res.data.data.forEach(r => {
+            if(r.studentId == currentUser.studentId) {
+                html += `
+    <div class="card" style="border-right: 4px solid var(--success); background: #ffffff;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="background:#dcfce7; color:#166534; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <div style="font-weight:800; font-size:14px;">تقرير الحفظ اليومي</div>
+                    <small style="color:var(--secondary);">${r.time}</small>
+                </div>
+            </div>
+            <span class="status-badge bg-success" style="padding:8px 15px;">${r.evaluation}</span>
+        </div>
+        <div style="margin-top:15px; padding:12px; background:#f8fafc; border-radius:10px; font-size:14px; border: 1px solid #f1f5f9;">
+            <strong style="color:var(--primary);">ما تم حفظه:</strong> ${r.hifz}
+        </div>
+    </div>`;
+
+            }
+        });
+        document.getElementById('reports-content').innerHTML = html || '<p style="text-align:center;">لا توجد تقارير أداء لليوم.</p>';
+    }
+
+    async function loadChat() {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getMessages", channelId: currentUser.courseId } });
+        let html = '';
+        res.data.data.forEach(m => {
+            const type = m.sender == currentUser.nameAr ? 'msg-me' : 'msg-other';
+            html += `<div class="msg ${type}">
+                        <strong style="display:block; font-size:11px; margin-bottom:4px; opacity:0.8;">${m.sender}</strong>
+                        ${m.content}
+                        <small style="display:block; text-align:left; font-size:10px; margin-top:5px; opacity:0.7;">${m.time}</small>
+                    </div>`;
+        });
+        document.getElementById('chat-messages').innerHTML = html;
+        const chatBox = document.getElementById('chat-messages');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function loadQuestions() {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getQuestionsByCourse", courseId: currentUser.courseId } });
+        let html = '';
+        res.data.data.forEach(q => {
+            html += `
+    <div class="card" style="border: 1px solid #e2e8f0; border-radius: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <span style="background:#eef2ff; color:var(--primary); padding:4px 12px; border-radius:8px; font-size:12px; font-weight:700;">${q.difficulty}</span>
+            <i class="far fa-question-circle" style="color:#cbd5e1;"></i>
+        </div>
+        <div style="margin:15px 0; font-weight:800; font-size:18px; color:#1e293b;">${q.text}</div>
+        <div style="display:grid; gap:8px;">
+            <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #f1f5f9;">
+                <b style="color:var(--primary);">أ)</b> ${q.optA}
+            </div>
+            <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #f1f5f9;">
+                <b style="color:var(--primary);">ب)</b> ${q.optB}
+            </div>
+        </div>
+        <button class="reveal-btn" onclick="this.nextElementSibling.style.display='block'; this.style.display='none'; this.parentElement.classList.add('answer-animation')">
+            <i class="fas fa-eye"></i> كشف الإجابة الصحيحة
+        </button>
+        <div style="display:none; color:#15803d; font-weight:800; margin-top:15px; text-align:center; padding:12px; background:#f0fdf4; border-radius:12px; border: 1px dashed #10b981;">
+             ✨ الإجابة الصحيحة هي: ${q.correct}
+        </div>
+    </div>`;
+
+        });
+        document.getElementById('questions-content').innerHTML = html || '<p>لا توجد أسئلة متاحة حالياً.</p>';
+    }
+
+    async function checkQuestionsAvailability() {
+        try {
+            const res = await axios.get(WEB_APP_URL, { params: { action: "hasCourseQuestions", courseId: currentUser.courseId } });
+            const qTab = document.getElementById('questions-tab');
+            qTab.style.display = 'inline-flex';
+            if (res.data.data.hasQuestions) {
+                qTab.innerHTML = '<i class="fas fa-brain"></i> بنك الأسئلة';
+                qTab.classList.remove('disabled');
+                qTab.onclick = () => switchTab('questions');
+            } else {
+                qTab.innerHTML = '<i class="fas fa-lock"></i> بنك الأسئلة';
+                qTab.classList.add('disabled');
+                qTab.onclick = () => alert("عذراً، بنك الأسئلة غير متاح لدورتك حالياً.");
+            }
+        } catch (e) { console.error("Availability check failed"); }
+    }
+
+    window.onload = () => {
+        const saved = localStorage.getItem('student');
+        if(saved) { currentUser = JSON.parse(saved); initDashboard(); }
+    };
+
+    function logout() { 
+        if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+            localStorage.clear(); location.reload(); 
+        }
+    }
+    
+    
+    
+    // --- وظائف المساعدة والـ UI ---
+
+function showToast(message, icon = 'info-circle') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+// --- تطوير وظائف الواجبات ---
+
+async function loadAssignments() {
+    // محاكاة تحميل بيانات إضافية للتقسيم الجديد
+    const res = await axios.get(WEB_APP_URL, { params: { action: "getHomeworkByCourse", courseId: currentUser.courseId } });
+    const list = document.getElementById('assignments-list');
+    const completedList = document.getElementById('completed-assignments-list');
+    
+    list.innerHTML = ''; completedList.innerHTML = '';
+
+    res.data.data.forEach(h => {
+        const card = `
+            <div class="card" style="border-right: 4px solid var(--primary); margin-bottom:10px; padding:15px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <strong>${h.title}</strong>
+                    <button onclick="openModal('upload-modal')" style="border:none; background:none; cursor:pointer; color:var(--primary); font-size:18px;"><i class="fas fa-upload"></i></button>
+                </div>
+                <small style="display:block; color:var(--secondary); margin:5px 0;">${h.dueDate}</small>
+                <span class="status-badge bg-warning" style="font-size:10px;">قيد التنفيذ</span>
+            </div>`;
+        
+        if(h.status === 'مكتمل') completedList.innerHTML += card.replace('bg-warning', 'bg-success').replace('قيد التنفيذ', 'مكتمل');
+        else list.innerHTML += card;
+    });
+}
+
+function handleUpload() {
+    const title = document.getElementById('assign-title-up').value;
+    const desc = document.getElementById('assign-desc-up').value;
+    if(!title || !desc) return showToast("يرجى ملء الحقول الإجبارية", "exclamation-triangle");
+    
+    // هنا يتم الربط مع الـ API الفعلي الخاص بك
+    showToast("تم رفع الواجب بنجاح! 🚀", "check-circle");
+    closeModal('upload-modal');
+}
+
+// --- تطوير وظائف الشات ---
+
+async function loadChat() {
+    // 1. تحميل الأعضاء
+    // تحديث قائمة الأعضاء في الـ HTML
+const membersBox = document.getElementById('chat-members');
+membersBox.innerHTML = `
+    <div class="member-card">
+        <div class="member-avatar"><i class="fas fa-user-graduate"></i></div>
+        <div class="member-info">
+            <div class="name">الأستاذ أحمد</div>
+            <div class="status">متصل الآن</div>
+        </div>
+    </div>
+    `;
+
+// تحديث قائمة القنوات
+// متغير لتخزين معرف المحادثة النشطة حالياً
+let activeChatId = null;
+
+async function loadChat() {
+    try {
+        // 1. جلب وتحميل الأعضاء للمحادثات الخاصة
+        const membersRes = await axios.get(WEB_APP_URL, { 
+            params: { action: "getAllChatMembers", studentId: currentUser.studentId } 
+        });
+        
+        const privateBox = document.getElementById('privateChatUsers');
+        privateBox.innerHTML = ''; // تفريغ رسالة التحميل
+
+        membersRes.data.data.forEach(user => {
+            privateBox.innerHTML += `
+                <a href="#" class="list-group-item list-group-item-action border-0 mb-1 rounded shadow-sm" 
+                   onclick="startPrivateChat('${user.id}', '${user.name}')">
+                    <div class="d-flex align-items-center">
+                        <img src="${user.image}" class="rounded-circle me-2" width="35" height="35" onerror="this.src='https://via.placeholder.com/35'">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0" style="font-size:14px;">${user.name}</h6>
+                            <small class="${user.status === 'متصل' ? 'text-success' : 'text-muted'}" style="font-size:11px;">
+                                ${user.status}
+                            </small>
+                        </div>
+                    </div>
+                </a>`;
+        });
+
+        // 2. جلب وتحميل القنوات (المجموعات)
+        const channelsRes = await axios.get(WEB_APP_URL, { 
+            params: { action: "getMyChannels", studentId: currentUser.studentId } 
+        });
+        
+        const channelsBox = document.getElementById('userChannelsList');
+        channelsBox.innerHTML = '';
+
+        channelsRes.data.data.forEach(ch => {
+            channelsBox.innerHTML += `
+                <a href="#" class="list-group-item list-group-item-action border-0 mb-1 rounded shadow-sm" 
+                   onclick="loadMessages('${ch.channelId}')">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width:35px; height:35px;">
+                            <i class="bi bi-hash"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0" style="font-size:14px;">${ch.channelId}</h6>
+                            <small class="text-muted" style="font-size:11px;">قناة رسمية</small>
+                        </div>
+                    </div>
+                </a>`;
+        });
+
+    } catch (e) {
+        console.error("Chat Load Error:", e);
+    }
+}
+
+// دالة بدء محادثة خاصة (استدعاء getOrCreatePrivateChat من السكربت)
+async function startPrivateChat(targetId, targetName) {
+    const res = await axios.get(WEB_APP_URL, { 
+        params: { action: "getOrCreatePrivateChat", studentId: currentUser.studentId, targetId: targetId } 
+    });
+    if(res.data.success) {
+        loadMessages(res.data.data.channelId);
+    }
+}
+
+// دالة تحميل الرسائل وعرضها في الحاوية
+async function loadMessages(channelId) {
+    activeChatId = channelId;
+    const container = document.getElementById('chatMessagesContainer');
+    container.innerHTML = '<div class="text-center mt-5"><div class="spinner-border spinner-border-sm"></div></div>';
+
+    const res = await axios.get(WEB_APP_URL, { 
+        params: { action: "getMessages", channelId: channelId } 
+    });
+
+    let html = '';
+    res.data.data.forEach(m => {
+        const isMe = m.sender === currentUser.nameAr;
+        html += `
+            <div class="d-flex ${isMe ? 'justify-content-start' : 'justify-content-end'} mb-3">
+                <div class="p-2 px-3 rounded shadow-sm" style="max-width:80%; ${isMe ? 'background:#4f46e5; color:white;' : 'background:#f8fafc; border:1px solid #eee;'}">
+                    <small class="d-block fw-bold" style="font-size:10px; opacity:0.8">${m.sender}</small>
+                    <div style="font-size:14px">${m.content}</div>
+                    <small class="d-block text-end" style="font-size:9px; opacity:0.6">${m.time}</small>
+                </div>
+            </div>`;
+    });
+    
+    container.innerHTML = html || '<div class="text-center text-muted mt-5">لا توجد رسائل بعد.. ابدأ المحادثة!</div>';
+    container.scrollTop = container.scrollHeight;
+}
+
+// دالة إرسال الرسالة (تتواصل مع doPost في السكربت)
+async function sendMessage() {
+    const input = document.getElementById('chatMsgInput');
+    const msg = input.value.trim();
+    if (!msg || !activeChatId) return;
+
+    // تعطيل الزر مؤقتاً
+    input.disabled = true;
+
+    const payload = {
+        apiKey: "YOUR_MASTER_KEY", // تأكد من مطابقة الـ API Key في السكربت
+        action: "manageChat",
+        subAction: "sendMessage",
+        channelId: activeChatId,
+        sender: currentUser.nameAr,
+        content: msg
+    };
+
+    try {
+        await axios.post(WEB_APP_URL, JSON.stringify(payload));
+        input.value = '';
+        loadMessages(activeChatId); // إعادة تحميل الرسائل
+    } catch (e) {
+        alert("فشل الإرسال");
+    } finally {
+        input.disabled = false;
+        input.focus();
+    }
+}
+
+
+// --- تطوير بنك الأسئلة ---
+
+// تعديل بسيط على دالة checkQuestionsAvailability لتعمل مع الـ Toast
+async function checkQuestionsAvailability() {
+    try {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "hasCourseQuestions", courseId: currentUser.courseId } });
+        const qTab = document.getElementById('questions-tab');
+        qTab.style.display = 'inline-flex';
+        
+        if (res.data.data.hasQuestions) {
+            qTab.innerHTML = '<i class="fas fa-brain"></i> بنك الأسئلة';
+            qTab.classList.remove('disabled');
+            qTab.onclick = () => switchTab('questions');
+        } else {
+            qTab.innerHTML = '<i class="fas fa-lock"></i> بنك الأسئلة';
+            qTab.classList.add('disabled');
+            qTab.onclick = () => showToast("✨ الاختبارات لم تُفتح بعد. استعد جيداً! 💪", "lock");
+        }
+    } catch (e) { console.error("Availability check failed"); }
+}
+
+    
+    
+    let activeChatId = null;
+
+// دالة التبديل بين تبويبات الشات (خاصة/قنوات)
+function switchChatTab(type) {
+    const pBox = document.getElementById('privateChatUsers');
+    const cBox = document.getElementById('userChannelsList');
+    if(type === 'private') {
+        pBox.style.display = 'block';
+        cBox.style.display = 'none';
+    } else {
+        pBox.style.display = 'none';
+        cBox.style.display = 'block';
+    }
+}
+
+async function loadChat() {
+    try {
+        // 1. جلب الأعضاء
+        const membersRes = await axios.get(WEB_APP_URL, { params: { action: "getAllChatMembers", studentId: currentUser.studentId } });
+        const privateBox = document.getElementById('privateChatUsers');
+        privateBox.innerHTML = membersRes.data.data.map(user => `
+            <div class="member-card" onclick="startPrivateChat('${user.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:10px;">
+                <img src="${user.image || 'https://via.placeholder.com/35'}" width="35" height="35" style="border-radius:50%">
+                <div>
+                    <div style="font-weight:700; font-size:14px;">${user.name}</div>
+                    <small style="color:${user.status === 'متصل' ? 'green' : 'gray'}">${user.status}</small>
+                </div>
+            </div>
+        `).join('');
+
+        // 2. جلب القنوات
+        const channelsRes = await axios.get(WEB_APP_URL, { params: { action: "getMyChannels", studentId: currentUser.studentId } });
+        const channelsBox = document.getElementById('userChannelsList');
+        channelsBox.innerHTML = channelsRes.data.data.map(ch => `
+            <div class="member-card" onclick="loadMessages('${ch.channelId}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:10px;">
+                <div style="background:#e0e7ff; color:#4f46e5; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-hashtag"></i></div>
+                <div style="font-weight:700; font-size:14px;">${ch.channelId}</div>
+            </div>
+        `).join('');
+
+    } catch (e) { console.error("Chat Error", e); }
+}
+
+async function startPrivateChat(targetId) {
+    const res = await axios.get(WEB_APP_URL, { params: { action: "getOrCreatePrivateChat", studentId: currentUser.studentId, targetId: targetId } });
+    if(res.data.success) loadMessages(res.data.data.channelId);
+}
+
+async function loadMessages(channelId) {
+    activeChatId = channelId;
+    const container = document.getElementById('chatMessagesContainer');
+    container.innerHTML = '<div class="text-center mt-5">جاري التحميل...</div>';
+    
+    try {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getMessages", channelId: channelId } });
+        container.innerHTML = res.data.data.map(m => {
+            const isMe = m.sender === currentUser.nameAr;
+            return `
+                <div style="display:flex; justify-content:${isMe ? 'flex-start' : 'flex-end'}; mb-10; margin-bottom:10px;">
+                    <div style="padding:10px 15px; border-radius:15px; max-width:80%; ${isMe ? 'background:#4f46e5; color:white' : 'background:#e2e8f0; color:black'}">
+                        <small style="display:block; font-size:10px; opacity:0.7">${m.sender}</small>
+                        ${m.content}
+                        <small style="display:block; font-size:9px; text-align:left; margin-top:5px;">${m.time}</small>
+                    </div>
+                </div>`;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+    } catch(e) { container.innerHTML = "فشل تحميل الرسائل"; }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('chatMsgInput');
+    const msg = input.value.trim();
+    if (!msg || !activeChatId) return;
+
+    input.disabled = true;
+    try {
+        await axios.post(WEB_APP_URL, JSON.stringify({
+            action: "manageChat",
+            subAction: "sendMessage",
+            channelId: activeChatId,
+            sender: currentUser.nameAr,
+            content: msg
+        }));
+        input.value = '';
+        loadMessages(activeChatId);
+    } catch (e) { alert("خطأ في الإرسال"); }
+    input.disabled = false;
+}
+
+// تعديل دالة الواجبات المكررة لتكون موحدة
+async function loadAssignments() {
+    try {
+        const res = await axios.get(WEB_APP_URL, { params: { action: "getAssignments" } });
+        const list = document.getElementById('assignments-list');
+        const completedList = document.getElementById('completed-assignments-list');
+        list.innerHTML = ''; completedList.innerHTML = '';
+
+        res.data.forEach(h => {
+            const isCompleted = h.الحالة === 'مكتمل';
+            const html = `
+                <div class="card" style="border-right: 4px solid ${isCompleted ? 'var(--success)' : 'var(--primary)'}; margin-bottom:10px; padding:15px;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${h.عنوان_الواجب}</strong>
+                        ${!isCompleted ? `<button onclick="openModal('upload-modal')" style="border:none; background:none; color:var(--primary);"><i class="fas fa-upload"></i></button>` : ''}
+                    </div>
+                    <small style="display:block; color:var(--secondary); margin:5px 0;">موعد التسليم: ${h.تاريخ_التسليم}</small>
+                    <span class="status-badge ${isCompleted ? 'bg-success' : 'bg-warning'}">${h.الحالة}</span>
+                </div>`;
+            if(isCompleted) completedList.innerHTML += html;
+            else list.innerHTML += html;
+        });
+    } catch (e) { console.error("Assignments error", e); }
+}
+
+</script>
+</body>
+</html>
